@@ -1,4 +1,4 @@
-//1.0.1
+//1.0.2
 #ifndef _CONSOLE_H_
 #define _CONSOLE_H_
 #include<cstdlib>
@@ -7,6 +7,7 @@
 #ifdef WIN_OS
 #include<cstdio>
 #include<windows.h>
+#include<conio.h>
 #else
 #include<curses.h>
 #endif
