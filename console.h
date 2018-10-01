@@ -1,4 +1,4 @@
-//1.0.2
+//1.0.3
 #ifndef _CONSOLE_H_
 #define _CONSOLE_H_
 #include<string>
@@ -10,6 +10,7 @@
 #include<windows.h>
 #include<conio.h>
 #else
+#include<cstdint>
 #include<curses.h>
 #include<system.h>
 #endif
@@ -20,15 +21,21 @@ class Console{
 				enum color:char{
 					black,red,green,c3,blue,c5,yellow,white
 				};
-				Color(color front,color back):m_front(front),m_back(back){}
+				Color(color front,color back):m_front(front),m_back(back){
+					#ifndef WIN_OS
+					m_id=rand()%32768|(rand()%32768<<15);
+					inited=false;
+					#endif
+				}
 				unsigned Windows()const{
 					return m_front|(m_back<<4)|0x8|0x80;
 				}
-				std::pair<unsigned,unsigned> linux()const{
-					return make_pair(m_front,m_back);
-				}
 			private:
 				color m_front,m_back;
+				#ifndef WIN_OS
+				int_least32_t m_id;
+				bool m_inited;
+				#endif
 		};
 		Console(){
 			#ifndef WIN_OS
@@ -105,10 +112,20 @@ class Console{
 			#endif
 		}
 		static void set_color(Color color){
+			using namespace std;
 			#ifdef WIN_OS
-
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),color.Windows());
 			#else
-			
+			static bool started=false;
+			static int_least32_t used=-1;
+			if(!started)
+				if(start_color()!=OK)
+					throw string("Cannot use the colors");
+			if(!color.m_inited)
+				init_pair(color,m_id);
+			if(used!=-1)
+				attroff(COLOR_PAIR(used));
+			attron(COLOR_PAIR(used=m_id));
 			#endif
 		}
 		static void clear(){
