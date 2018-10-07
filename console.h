@@ -1,4 +1,3 @@
-//1.0.3
 #ifndef _CONSOLE_H_
 #define _CONSOLE_H_
 #include<string>
@@ -13,22 +12,32 @@
 #include<cstdint>
 #include<curses.h>
 #include<system.h>
+#include"my_rand.h"
+#endif
+#ifdef WIN_OS
+#define con_print printf
+#else
+#define con_print printw
 #endif
 class Console{
 	public:
 		class Color{
 			public:
 				enum color:char{
-					black,red,green,c3,blue,c5,yellow,white
+					#ifdef WIN_OS
+					black,blue=011,green,cyan,red,magenta,yellow,white=7
+					#else
+					black,red,green,yellow,blue,magenta,cyan,white
+					#endif
 				};
 				Color(color front,color back):m_front(front),m_back(back){
 					#ifndef WIN_OS
-					m_id=rand()%32768|(rand()%32768<<15);
+					m_id=MyRand::rand()%32768|(MyRand::rand()%32768<<15);
 					inited=false;
 					#endif
 				}
 				unsigned Windows()const{
-					return m_front|(m_back<<4)|0x8|0x80;
+					return m_front|(m_back<<4);
 				}
 			private:
 				color m_front,m_back;
@@ -49,10 +58,8 @@ class Console{
 		}
 		static void move(int x,int y){
 			#ifdef WIN_OS
-			HANDLE hout;
-			hout=GetStdHandle(STD_OUTPUT_HANDLE);
-			COORD pos={x,y};
-			SetConsoleCursorPosition(hout,pos);
+			HANDLE hout=GetStdHandle(STD_OUTPUT_HANDLE);
+			SetConsoleCursorPosition(hout,{(short)y,(short)x});
 			#else
 			::move(x,y);
 			#endif
@@ -90,7 +97,7 @@ class Console{
 			move(x,y);
 			printf("%s",str);
 			#else
-			mvaddstr(str);
+			mvaddstr(x,y,str);
 			#endif
 		}
 		static void mvprint(int x,int y,const std::string &str){
@@ -101,7 +108,7 @@ class Console{
 			move(x,y);
 			printf("%d",n);
 			#else
-			mvprintw("%d",n);
+			mvprintw(x,y,"%d",n);
 			#endif
 		}
 		static bool colorable(){

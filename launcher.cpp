@@ -8,13 +8,13 @@ void Launcher::main_menu(){
 			Console::clear();
 			Console::move(0,0);
 			Console::print("War Tower");
-			Console::move(9,1);
+			Console::move(1,9);
 			Console::print("By EnderPearl");
-			Console::move(0,2);
+			Console::move(2,0);
 			Console::print("1.New Game");
-			Console::move(0,3);
+			Console::move(3,0);
 			Console::print("2.Help");
-			Console::move(0,4);
+			Console::move(4,0);
 			Console::print("0.Quit");
 			echo=false;
 		}

@@ -1,4 +1,3 @@
-//1.0.1
 #ifndef _LAUNCHER_H_
 #define _LAUNCHER_H_
 class Launcher{
